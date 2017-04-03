@@ -22,10 +22,13 @@ class Melody
        seq
     end
 
-    def from_midi(track)
-        track.each do |event|
-            if event.class == MIDI::NoteOn
-                add_note_from_midi(event, event.off)
+    def from_midi(seq, channel_num)
+        seq.tracks.each do |track| 
+            track.each do |event|
+                if belongs_to_channel(event, channel_num)
+                    add_note_from_midi(event, event.off)
+            
+                end
             end
         end
     end
@@ -74,6 +77,10 @@ class Melody
 
     def add_midi(note) 
         MIDI::NoteOn.new(0, note[:pitch].to_i, 64, note[:duration].to_i) 
+    end
+
+    def belongs_to_channel(event, channel_num)
+        event.class == MIDI::NoteOn && event.channel == channel_num
     end
 
     def to_pitch(val) 
